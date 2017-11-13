@@ -1,4 +1,4 @@
-package towerbloxx;
+package javafxapplication3;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,7 +37,7 @@ public class Block extends Pane{
     public Block()
     {
         try {
-        InputStream block = Files.newInputStream(Paths.get("/Users/namedojimo/NetBeansProjects/Project/src/towerbloxx/box.png"));
+        InputStream block = Files.newInputStream(Paths.get("/Users/teerat/Documents/Java netbeans/JavaFXApplication3/src/javafxapplication3/box.png"));
         ImageView imgBlock = new ImageView(new Image(block));
         imgBlock.setFitWidth(blockWidth);
         imgBlock.setFitHeight(blockWidth);
@@ -94,10 +94,10 @@ public class Block extends Pane{
 //        };
 //        blockMovement.start();
 //    }  
-    public void detach() throws InterruptedException
+    public void detach() 
     {
         isDetach = true;
-        pathTransition.pause();
+        pathTransition.stop();
         totalBlock++;
         score += 10;
         blockY = (int) getTranslateY();
@@ -111,7 +111,7 @@ public class Block extends Pane{
         translateTransition.play();
         //pathTransition.setDelay(Duration.millis(3000));
         
-        swing();
+        //swing();
     }
     
     public Block makeNew()
