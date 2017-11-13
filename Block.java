@@ -110,10 +110,8 @@ public class Block extends Pane{
         translateTransition.setCycleCount(1);
         translateTransition.setAutoReverse(true);
         translateTransition.play();
-        
-        //swing();
+
         swing();
-        //pathTransition.setDelay(Duration.millis(10000));
         
     }
       
@@ -124,7 +122,6 @@ public class Block extends Pane{
         newBlock.blockY = 100;
         getChildren().add(newBlock); 
       
-        //swing(newBlock);
         return newBlock;
     }
 }
