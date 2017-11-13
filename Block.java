@@ -5,9 +5,14 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import javafx.animation.AnimationTimer;
+import javafx.animation.PathTransition;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
+import javafx.scene.shape.CubicCurveTo;
+import javafx.scene.shape.MoveTo;
+import javafx.scene.shape.Path;
+import javafx.util.Duration;
 
 public class Block extends Pane{
     int blockX = 100;
@@ -40,53 +45,50 @@ public class Block extends Pane{
         }
     }
     
-    public void move()
+    public void swing()
     {
-//        AnimationTimer blockMovement = new AnimationTimer()
-//        {
+        Path path = new Path();
+        MoveTo moveTo = new MoveTo(100, 0);
+        CubicCurveTo cubicCurveTo = new CubicCurveTo(100, 0, 200, 250, 500, 0);
+
+        path.getElements().add(moveTo);
+        path.getElements().add(cubicCurveTo);
+
+        PathTransition pathTransition = new PathTransition();
+        pathTransition.setDuration(Duration.millis(2000)); 
+        pathTransition.setNode(this);
+        pathTransition.setPath(path);
+        pathTransition.setCycleCount(50);
+        pathTransition.setAutoReverse(true);
+        pathTransition.play();
+    }
+    
+//    public void move()
+//    {      
+//        blockMovement = new AnimationTimer()
+//        { 
 //            public void handle(long arg0)
 //            {
-//                blockX += blockSpeed;
-//                if (blockX + blockWidth >= Main.width)
+//                if (angle < 50)
 //                {
-//                    blockX = Main.width - blockWidth;
-//                    blockSpeed *= -1;
+//                    angle++;
+//                    blockX += blockSpeed + Math.sin(Math.toRadians(angle)) * radius;
+//                    blockY += blockSpeed + Math.cos(Math.toRadians(angle)) * radius;
 //                }
-//                else if (blockX + blockWidth < 0)
+//                
+//                else
 //                {
-//                    blockX += blockWidth;
-//                    blockSpeed *= -1;
+//                    angle++;
+//                    blockX += blockSpeed + Math.cos(Math.toRadians(angle)) * radius;
+//                    blockY -= blockSpeed + Math.sin(Math.toRadians(angle)) * radius;
 //                }
+//                
 //                setTranslateX(blockX);
 //                setTranslateY(blockY);
 //            }
 //        };
 //        blockMovement.start();
-        
-        blockMovement = new AnimationTimer()
-        { 
-            public void handle(long arg0)
-            {
-                if (angle < 50)
-                {
-                    angle++;
-                    blockX += blockSpeed + Math.sin(Math.toRadians(angle)) * radius;
-                    blockY += blockSpeed + Math.cos(Math.toRadians(angle)) * radius;
-                }
-                
-                else
-                {
-                    angle++;
-                    blockX += blockSpeed + Math.cos(Math.toRadians(angle)) * radius;
-                    blockY -= blockSpeed + Math.sin(Math.toRadians(angle)) * radius;
-                }
-                
-                setTranslateX(blockX);
-                setTranslateY(blockY);
-            }
-        };
-        blockMovement.start();
-    }
+//    }
     
     public void detach()
     {
