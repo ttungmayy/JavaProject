@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import javafx.animation.PathTransition;
 import javafx.animation.TranslateTransition;
 import javafx.scene.image.Image;
@@ -15,28 +16,36 @@ import javafx.scene.shape.Path;
 import javafx.util.Duration;
 
 public class Block extends Pane{
-    int blockX = 100;
-    int blockY = 100;
+    int blockX = 0;
+    int blockY = 0;
     int blockWidth = 100;
     int blockHeight = 100;
+    int blockSpeed = 5;
     int totalBlock = 0;
     int score = 0;
-    int swingCount = 5;
-    int detachPosY = 650;
-    boolean gameOver = false;
-    TranslateTransition translateTransition = new TranslateTransition();
-    PathTransition pathTransition = new PathTransition();
+    int detachPosY = 750;
+    boolean isDetach = false;
+    boolean isOver = false;
+    int count = 0;
+    Path path;
+    PathTransition pathTransition;
+    TranslateTransition translateTransition;
+    InputStream block;
     ImageView imgBlock;
+    Block newBlock;
+    ArrayList<Block> blockList = new ArrayList<>();
+    int blockPrev = 0;
+    int blockCurrent = 0;
     
     public Block()
     {
         try {
-            InputStream block = Files.newInputStream(Paths.get("C:/Users/PM/Documents/NetBeansProjects/TowerBloxx/src/towerbloxx/box.png"));
+            block = Files.newInputStream(Paths.get("C:/Users/PM/Documents/NetBeansProjects/TowerBloxx/src/towerbloxx/box.png"));
             imgBlock = new ImageView(new Image(block));
             imgBlock.setFitWidth(blockWidth);
             imgBlock.setFitHeight(blockHeight);
-            imgBlock.setTranslateX(blockX);
-            imgBlock.setTranslateY(blockY);
+            //imgBlock.setTranslateX(blockX);
+            //imgBlock.setTranslateY(blockY);
             getChildren().add(imgBlock);
         } catch (IOException e)
         {
@@ -45,66 +54,78 @@ public class Block extends Pane{
     }
     
     public void swing()
-    {
-        Path path = new Path();
-        MoveTo moveTo = new MoveTo(100, 0);
-        CubicCurveTo cubicCurveTo = new CubicCurveTo(100, 0, 200, 250, 700, 0);
-        
+    { 
+        path = new Path();
+        MoveTo moveTo = new MoveTo(200, 50);
+        CubicCurveTo cubicCurveTo = new CubicCurveTo(200, 50, 250, 300, 824, 50);
+
         path.getElements().add(moveTo);
         path.getElements().add(cubicCurveTo);
 
-        pathTransition.setDuration(Duration.millis(2000)); 
-        pathTransition.setNode(this);
+        pathTransition = new PathTransition();
+        pathTransition.setDuration(Duration.millis(1000));
+        
+        if (count == 0)
+        {
+            pathTransition.setNode(imgBlock);
+            count++;
+        }
+        else
+        {      
+            newBlock = new Block();
+            getChildren().add(newBlock); 
+            pathTransition.setNode(newBlock);
+        }
+
         pathTransition.setPath(path);
-        pathTransition.setCycleCount(swingCount);
+        pathTransition.setCycleCount(20);
         pathTransition.setAutoReverse(true);
-        pathTransition.play();
+        pathTransition.play();  
     }
-    
-    public void detach()
+    public void detach() 
     {
         pathTransition.stop();
         totalBlock++;
         score += 10;
         
+        translateTransition = new TranslateTransition();  
         translateTransition.setDuration(Duration.millis(1000));
-        translateTransition.setNode(imgBlock);
-        translateTransition.setToY(detachPosY);
+        if (count == 1)         // first block 
+        {
+            translateTransition.setNode(imgBlock);
+            translateTransition.setToY(750);
+            count++;
+            blockPrev = 0;
+            blockCurrent = 0;
+            this.blockX = (int)imgBlock.getTranslateX();
+            blockList.add(this);
+        }
+        else
+        {     
+            if (count == 2)    // second block
+                blockPrev = 0;
+            else               // 3 , 4 , 5 , ... block
+                blockPrev++;
+            count++;
+            blockCurrent = blockPrev + 1;
+            detachPosY -= 83;
+            translateTransition.setNode(newBlock);
+            translateTransition.setToY(detachPosY);
+            newBlock.blockX = (int)newBlock.getTranslateX();
+            blockList.add(newBlock);
+        }
         translateTransition.setCycleCount(1);
         translateTransition.setAutoReverse(true);
         translateTransition.play();
-<<<<<<< HEAD
-
+       
+        // check if it can be placed on previous block / fall out of window
+        if (blockList.size() > 1)
+        {
+            if (blockList.get(blockPrev).blockX - blockList.get(blockCurrent).blockX >= 50)
+                System.out.println("FALL LEFT");
+            if (blockList.get(blockCurrent).blockX - blockList.get(blockPrev).blockX >= 50)
+                System.out.println("FALL RIGHT");
+        }
         swing();
-        
-    }
-      
-    public Block makeNew()
-    {    
-        newBlock = new Block();
-        newBlock.blockX = 100;
-        newBlock.blockY = 100;
-        getChildren().add(newBlock); 
-      
-        return newBlock;
-=======
-        
-        detachPosY -= blockHeight;
-        makeNew();
-    }
-    
-    public void makeNew()
-    {
-        blockX = 100;
-        blockY = 100;
-        Block newBlock = new Block();
-        getChildren().add(newBlock);
-        newBlock.swing();
-    }
-    
-    public boolean isGameOver()
-    {
-        return gameOver;
->>>>>>> d0d6590050240bd56e129b27432e2b4dfecdf66f
     }
 }
