@@ -93,7 +93,7 @@ public class Block extends Pane {
         if (count == 1) // first block 
         {
             translateTransition.setNode(imgBlock);
-            translateTransition.setToY(750);
+            translateTransition.setToY(700);
             count++;
             blockPrev = 0;
             blockCurrent = 0;
@@ -116,7 +116,7 @@ public class Block extends Pane {
             blockCurrent = blockPrev + 1;
             detachPosY -= 83;   
             translateTransition.setNode(newBlock);
-            translateTransition.setToY(detachPosY);
+            translateTransition.setToY(detachPosY-50);
             newBlock.blockX = (int) newBlock.getTranslateX();
             newBlock.blockY = detachPosY;      
             blockList.add(newBlock);  
@@ -129,7 +129,7 @@ public class Block extends Pane {
             if (blockList.get(blockPrev).blockY - blockList.get(blockCurrent).blockY == 83) {
                 
                 if ((blockList.get(blockCurrent).blockX + blockWidth) - blockList.get(blockPrev).blockX > 0
-                        && ((blockList.get(blockCurrent).blockX + blockWidth) - blockList.get(blockPrev).blockX <= 50)) {
+                        && ((blockList.get(blockCurrent).blockX + blockWidth) - blockList.get(blockPrev).blockX <= 30)) {
                     System.out.println("Collapse Left");
                     blockPrev--;
                     detachPosY += 83;
@@ -137,7 +137,7 @@ public class Block extends Pane {
                     collapseLeft(); 
                  
                 } else if ((blockList.get(blockPrev).blockX + blockWidth) - blockList.get(blockCurrent).blockX > 0
-                        && ((blockList.get(blockPrev).blockX + blockWidth) - blockList.get(blockCurrent).blockX <= 50)) {
+                        && ((blockList.get(blockPrev).blockX + blockWidth) - blockList.get(blockCurrent).blockX <= 30)) {
                     System.out.println("Collapse Right");
                     blockPrev--;
                     detachPosY += 83;
@@ -233,4 +233,5 @@ public class Block extends Pane {
         translateTransition.setAutoReverse(false);
         translateTransition.play();
     }
+   
 }
