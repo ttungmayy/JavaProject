@@ -17,7 +17,8 @@ import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.util.Duration;
 
-public class Block extends Pane{
+public class Block extends Pane {
+
     int blockX = 0;
     int blockY = 0;
     int blockWidth = 100;
@@ -41,23 +42,20 @@ public class Block extends Pane{
     ArrayList<Block> blockList = new ArrayList<>();
     int blockPrev = 0;
     int blockCurrent = 0;
-    
-    public Block()
-    {
+
+    public Block() {
         try {
-            block = Files.newInputStream(Paths.get("C:/Users/PM/Documents/NetBeansProjects/TowerBloxx/src/towerbloxx/box.png"));
+            block = Files.newInputStream(Paths.get("/Users/namedojimo/NetBeansProjects/Project/src/towerbloxx/box.png"));
             imgBlock = new ImageView(new Image(block));
             imgBlock.setFitWidth(blockWidth);
             imgBlock.setFitHeight(blockHeight);
             getChildren().add(imgBlock);
-        } catch (IOException e)
-        {
+        } catch (IOException e) {
             System.out.println("Cannot load box.png");
         }
     }
-    
-    public void swing()
-    { 
+
+    public void swing() {
         path = new Path();
         moveTo = new MoveTo(200, 50);
         CubicCurveTo cubicCurveTo = new CubicCurveTo(200, 50, 250, 300, 824, 50);
@@ -67,94 +65,113 @@ public class Block extends Pane{
 
         pathTransition = new PathTransition();
         pathTransition.setDuration(Duration.millis(1000));
-        
-        if (count == 0)
-        {
+
+        if (count == 0) {
             pathTransition.setNode(imgBlock);
             count++;
-        }
-        else
-        {      
+        } else {
             newBlock = new Block();
-            getChildren().add(newBlock); 
+            getChildren().add(newBlock);
             pathTransition.setNode(newBlock);
         }
 
         pathTransition.setPath(path);
         pathTransition.setCycleCount(20);
         pathTransition.setAutoReverse(true);
-        pathTransition.play();  
+        pathTransition.play();
     }
-    public void detach() 
-    {
+
+    public void detach() {
         pathTransition.stop();
         totalBlock++;
         score += 10;
-        
-        translateTransition = new TranslateTransition();  
+
+        translateTransition = new TranslateTransition();
         translateTransition.setDuration(Duration.millis(1000));
-        if (count == 1)         // first block 
+        if (count == 1) // first block 
         {
             translateTransition.setNode(imgBlock);
-            translateTransition.setToY(750);
+            translateTransition.setToY(700);
             count++;
             blockPrev = 0;
             blockCurrent = 0;
-            this.blockX = (int)imgBlock.getTranslateX();
+            this.blockX = (int) imgBlock.getTranslateX();
             this.blockY = detachPosY;
             blockList.add(this);
-        }
-        else
-        {     
-            if (count == 2)    // second block
+            translateTransition.setCycleCount(1);
+            translateTransition.setAutoReverse(true);
+            translateTransition.play();
+        } else {
+
+            if (count == 2) // second block
+            {
                 blockPrev = 0;
-            else               // 3 , 4 , 5 , ... block
+            } else // 3 , 4 , 5 , ... block
+            {
                 blockPrev++;
+            }
             count++;
             blockCurrent = blockPrev + 1;
-            detachPosY -= 83;
+            detachPosY -= 83;   
             translateTransition.setNode(newBlock);
-            translateTransition.setToY(detachPosY);
-            newBlock.blockX = (int)newBlock.getTranslateX();
-            newBlock.blockY = detachPosY;
-            blockList.add(newBlock);
+            translateTransition.setToY(detachPosY-50);
+            newBlock.blockX = (int) newBlock.getTranslateX();
+            newBlock.blockY = detachPosY;      
+            blockList.add(newBlock);  
+            System.out.println(blockList.toString());
         }
-        translateTransition.setCycleCount(1);
-        translateTransition.setAutoReverse(true);
-        translateTransition.play();
+      
 
         // check collapse or fall away
-        if (blockList.size() > 1)
-        {
-            if (blockList.get(blockPrev).blockY - blockList.get(blockCurrent).blockY == 83)
-            {
+         if (blockList.size() >= 1) {
+            if (blockList.get(blockPrev).blockY - blockList.get(blockCurrent).blockY == 83) {
+                
                 if ((blockList.get(blockCurrent).blockX + blockWidth) - blockList.get(blockPrev).blockX > 0
+<<<<<<< HEAD
                     && ((blockList.get(blockCurrent).blockX + blockWidth) - blockList.get(blockPrev).blockX <= 50))
                 {
+=======
+                        && ((blockList.get(blockCurrent).blockX + blockWidth) - blockList.get(blockPrev).blockX <= 30)) {
+>>>>>>> 7ddf53472e7984ba1eb22262a241ffdcc1b8c922
                     System.out.println("Collapse Left");
                     blockPrev--;
                     detachPosY += 83;
                     blockList.remove(newBlock);
+<<<<<<< HEAD
                     collapseLeft();
                 }
                 
                 else if ((blockList.get(blockPrev).blockX + blockWidth) - blockList.get(blockCurrent).blockX > 0
                     && ((blockList.get(blockPrev).blockX + blockWidth) - blockList.get(blockCurrent).blockX <= 50))
                 {
+=======
+                    collapseLeft(); 
+                 
+                } else if ((blockList.get(blockPrev).blockX + blockWidth) - blockList.get(blockCurrent).blockX > 0
+                        && ((blockList.get(blockPrev).blockX + blockWidth) - blockList.get(blockCurrent).blockX <= 30)) {
+>>>>>>> 7ddf53472e7984ba1eb22262a241ffdcc1b8c922
                     System.out.println("Collapse Right");
                     blockPrev--;
                     detachPosY += 83;
                     blockList.remove(newBlock);
                     collapseRight();
+<<<<<<< HEAD
                 }
                 else if ((blockList.get(blockCurrent).blockX + blockWidth) - blockList.get(blockPrev).blockX < 0 || 
                         ((blockList.get(blockPrev).blockX + blockWidth) - blockList.get(blockCurrent).blockX < 0))
                 {
+=======
+
+                } else if (((blockList.get(blockCurrent).blockX + blockWidth) - blockList.get(blockPrev).blockX < 0)
+                        || ((blockList.get(blockPrev).blockX + blockWidth) - blockList.get(blockCurrent).blockX < 0))
+                        {
+>>>>>>> 7ddf53472e7984ba1eb22262a241ffdcc1b8c922
                     blockPrev--;
                     detachPosY += 83;
                     blockList.remove(newBlock);
                     falling();
                 }
+<<<<<<< HEAD
             }
         }
         swing();
@@ -165,13 +182,32 @@ public class Block extends Pane{
         int xPos = newBlock.blockX;
         int yPos = newBlock.blockY;
         
+=======
+        }
+
+        swing();
+    }
+          translateTransition.setCycleCount(1);
+          translateTransition.setAutoReverse(true);
+          translateTransition.play();
+    }
+
+    public void collapseLeft() {
+ 
+                    
+>>>>>>> 7ddf53472e7984ba1eb22262a241ffdcc1b8c922
         path = new Path();
         moveTo = new MoveTo(xPos + 50, yPos + 83);
 
+<<<<<<< HEAD
         CubicCurveTo cubicCurveTo = new CubicCurveTo(xPos + 50, yPos + 83, 
                                                     xPos - 25, yPos + 166, 
                                                     xPos - 50, yPos + 249);
         
+=======
+        CubicCurveTo cubicCurveTo = new CubicCurveTo(blockX - 100, blockY + 50, blockX - 100, blockY + 100, blockX - 200, blockY + 150);
+
+>>>>>>> 7ddf53472e7984ba1eb22262a241ffdcc1b8c922
         path.getElements().add(moveTo);
         path.getElements().add(cubicCurveTo);
         
@@ -183,33 +219,56 @@ public class Block extends Pane{
         pathTransition.setAutoReverse(false);
         pathTransition.setDelay(Duration.millis(1000));
         pathTransition.play();
+<<<<<<< HEAD
         
         rt = new RotateTransition(Duration.millis(2000), newBlock);
         rt.setByAngle(-400);
+=======
+
+        rt = new RotateTransition(Duration.millis(3000), newBlock);
+        rt.setByAngle(400);
+>>>>>>> 7ddf53472e7984ba1eb22262a241ffdcc1b8c922
         rt.setCycleCount(1);
         rt.setAutoReverse(false);
         rt.setDelay(Duration.millis(1000));
         rt.play();
+<<<<<<< HEAD
         
         ft = new FadeTransition(Duration.millis(2000), newBlock);
+=======
+
+        ft = new FadeTransition(Duration.millis(3000), newBlock);
+>>>>>>> 7ddf53472e7984ba1eb22262a241ffdcc1b8c922
         ft.setFromValue(1.0);
         ft.setToValue(-1.0);
         ft.setDelay(Duration.millis(1000));
         ft.play();
+       
     }
+<<<<<<< HEAD
     
     public void collapseRight()
     {
         int xPos = newBlock.blockX;
         int yPos = newBlock.blockY;
+=======
+
+    public void collapseRight() {
+        
+>>>>>>> 7ddf53472e7984ba1eb22262a241ffdcc1b8c922
         
         path = new Path();
         moveTo = new MoveTo(xPos + 50, yPos + 83);
 
+<<<<<<< HEAD
         CubicCurveTo cubicCurveTo = new CubicCurveTo(xPos + 50, yPos + 83, 
                                                     xPos + 25, yPos + 166, 
                                                     xPos + 50, yPos + 249);
         
+=======
+        CubicCurveTo cubicCurveTo = new CubicCurveTo(blockX + 100, blockY + 50, blockX + 100, blockY + 100, blockX + 200, blockY + 150);
+
+>>>>>>> 7ddf53472e7984ba1eb22262a241ffdcc1b8c922
         path.getElements().add(moveTo);
         path.getElements().add(cubicCurveTo);
 
@@ -221,30 +280,30 @@ public class Block extends Pane{
         pathTransition.setAutoReverse(false);
         pathTransition.setDelay(Duration.millis(1000));
         pathTransition.play();
-        
+
         rt = new RotateTransition(Duration.millis(3000), newBlock);
         rt.setByAngle(400);
         rt.setCycleCount(1);
         rt.setAutoReverse(false);
         rt.setDelay(Duration.millis(1000));
         rt.play();
-        
+
         ft = new FadeTransition(Duration.millis(3000), newBlock);
         ft.setFromValue(1.0);
         ft.setToValue(-1.0);
         ft.setDelay(Duration.millis(1000));
         ft.play();
     }
-    
-    public void falling()
-    {
+
+    public void falling() {
         translateTransition = new TranslateTransition();
         translateTransition.setNode(newBlock);
         translateTransition.setDuration(Duration.millis(1000));
         translateTransition.setToY(700);
         translateTransition.setCycleCount(1);
-        translateTransition.setAutoReverse(false); 
+        translateTransition.setAutoReverse(false);
         translateTransition.play();
+<<<<<<< HEAD
 
         rt = new RotateTransition(Duration.millis(1000), newBlock);
         rt.setByAngle(500);
@@ -258,3 +317,8 @@ public class Block extends Pane{
         ft.play();      
     }
 }
+=======
+    }
+   
+}
+>>>>>>> 7ddf53472e7984ba1eb22262a241ffdcc1b8c922
