@@ -5,12 +5,12 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Random;
 import javafx.animation.FadeTransition;
 import javafx.animation.PathTransition;
 import javafx.animation.RotateTransition;
 import javafx.animation.TranslateTransition;
+import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -20,7 +20,6 @@ import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
-import javafx.scene.text.Text;
 import javafx.util.Duration;
 
 public class Block extends Pane {
@@ -31,10 +30,9 @@ public class Block extends Pane {
     int blockHeight = 100;
     int blockSpeed = 5;
     int totalBlock = 0;
-    int score;
-    Label Showscore = new Label("0");
-
-    Label Text = new Label("Tower");
+    int life = 3;
+    Label score = new Label("");
+    Label lifePoint = new Label("");
     int detachPosY = 750;
     boolean isDetach = false;
     boolean isOver = false;
@@ -52,20 +50,19 @@ public class Block extends Pane {
     ArrayList<Block> newBlockList = new ArrayList<>();
     int blockPrev = 0;
     int blockCurrent = 0;
-    int scrollY = 860;
+    int scrollY = 215;
     int countnum = 250;
     int countScroll = 0;
     int bgPos = 50;
-    //ImageView bg;
     TranslateTransition background;
-    boolean check = false;
     InputStream human;
     ImageView imgHuman;
+    String mode = "default";
 
-    public Block() {
-
+    public Block() 
+    {
         try {
-            block = Files.newInputStream(Paths.get("/Users/namedojimo/NetBeansProjects/Project/src/towerbloxx/block.png"));
+            block = Files.newInputStream(Paths.get("/Users/PM/Documents/NetBeansProjects/TowerBloxx/src/towerbloxx/block.png"));
             imgBlock = new ImageView(new Image(block));
             imgBlock.setFitWidth(blockWidth);
             imgBlock.setFitHeight(blockHeight);
@@ -73,12 +70,30 @@ public class Block extends Pane {
         } catch (IOException e) {
             System.out.println("Cannot load block.png");
         }
+        
         getChildren().add(imgBlock);
-        // getChildren().add(Showscore);
+    }
+    
+    public Block(int blockNumber) 
+    {
 
+        try {
+            block = Files.newInputStream(Paths.get("/Users/PM/Documents/NetBeansProjects/TowerBloxx/src/towerbloxx/block.png"));
+            imgBlock = new ImageView(new Image(block));
+            imgBlock.setFitWidth(blockWidth);
+            imgBlock.setFitHeight(blockHeight);
+
+        } catch (IOException e) {
+            System.out.println("Cannot load block.png");
+        }
+        
+        getChildren().add(imgBlock);
+        mode = "story";
+        totalBlock = blockNumber;
     }
 
-    public void swing() {
+    public void swing() 
+    {
         path = new Path();
         moveTo = new MoveTo(200, 50);
         CubicCurveTo cubicCurveTo = new CubicCurveTo(200, 50, 250, 300, 824, 50);
@@ -90,19 +105,27 @@ public class Block extends Pane {
         pathTransition.setDuration(Duration.millis(1000));
 
         if (count == 0) {
-            pathTransition.setNode(imgBlock);
-            getChildren().add(Showscore);
-            getChildren().add(Text);
-            Showscore.setText(totalBlock + "");
-            Text.setTranslateY(0);
-            Text.setFont(Font.font("Tw Cen MT Condensed", FontWeight.SEMI_BOLD, 50));
-            Showscore.setTranslateY(bgPos);
-            totalBlock += 1;
-            Showscore.setFont(Font.font("Tw Cen MT Condensed", FontWeight.SEMI_BOLD, 100));
-
             count++;
-        } else {
-            newBlock = new Block();
+            pathTransition.setNode(imgBlock);
+ 
+            score.setText("Total : " + totalBlock);
+            score.setTranslateX(50);
+            score.setTranslateY(30);
+            score.setFont(Font.font("Tw Cen MT Condensed", FontWeight.SEMI_BOLD, 60));
+            
+            lifePoint.setText("Life : " + life);
+            lifePoint.setTranslateX(850);
+            lifePoint.setTranslateY(30);
+            lifePoint.setFont(Font.font("Tw Cen MT Condensed", FontWeight.SEMI_BOLD, 60));
+            
+            getChildren().addAll(score , lifePoint); 
+        }
+        else 
+        {
+            if (mode.equals("story"))
+                newBlock = new Block(totalBlock - 1);
+            else
+                newBlock = new Block();
             getChildren().add(newBlock);
             pathTransition.setNode(newBlock);
         }
@@ -113,11 +136,12 @@ public class Block extends Pane {
         pathTransition.play();
     }
 
-    public void detach() {
+    public void detach() 
+    {
         pathTransition.stop();
-
         translateTransition = new TranslateTransition();
         translateTransition.setDuration(Duration.millis(1000));
+        
         if (count == 1) // first block 
         {
             translateTransition.setNode(imgBlock);
@@ -128,9 +152,15 @@ public class Block extends Pane {
             this.blockX = (int) imgBlock.getTranslateX();
             this.blockY = detachPosY;
             blockList.add(this);
-            Showscore.setText(totalBlock + "");
-
-        } else {
+            if (mode.equals(("story")))
+                totalBlock--;
+            else
+                totalBlock++;
+            
+            score.setText("Total : " + totalBlock);
+        } 
+        else 
+        {
             if (count == 2) // second block
             {
                 blockPrev = 0;
@@ -153,70 +183,95 @@ public class Block extends Pane {
         translateTransition.play();
 
         // check collapse or fall away
-        if (blockList.size() > 1) {
+        if (blockList.size() > 1)
+        {
             if (blockList.get(blockPrev).blockY - blockList.get(blockCurrent).blockY == 100) {
                 if ((blockList.get(blockCurrent).blockX + blockWidth) - blockList.get(blockPrev).blockX > 0
-                        && ((blockList.get(blockCurrent).blockX + blockWidth) - blockList.get(blockPrev).blockX <= 50)) {
+                        && ((blockList.get(blockCurrent).blockX + blockWidth) - blockList.get(blockPrev).blockX <= 50)) 
+                {
                     System.out.println("Collapse Left");
                     blockPrev--;
                     detachPosY += 100;
                     blockList.remove(newBlock);
                     collapseLeft();
-                } else if ((blockList.get(blockPrev).blockX + blockWidth) - blockList.get(blockCurrent).blockX > 0
-                        && ((blockList.get(blockPrev).blockX + blockWidth) - blockList.get(blockCurrent).blockX <= 50)) {
+                    life--;
+                    lifePoint.setText("Life : " + life);
+                } 
+                else if ((blockList.get(blockPrev).blockX + blockWidth) - blockList.get(blockCurrent).blockX > 0
+                        && ((blockList.get(blockPrev).blockX + blockWidth) - blockList.get(blockCurrent).blockX <= 50)) 
+                {
                     System.out.println("Collapse Right");
                     blockPrev--;
                     detachPosY += 100;
                     blockList.remove(newBlock);
                     collapseRight();
-                } else if ((blockList.get(blockCurrent).blockX + blockWidth) - blockList.get(blockPrev).blockX < 0
-                        || ((blockList.get(blockPrev).blockX + blockWidth) - blockList.get(blockCurrent).blockX < 0)) {
+                    life--;
+                    lifePoint.setText("Life : " + life);
+                } 
+                else if ((blockList.get(blockCurrent).blockX + blockWidth) - blockList.get(blockPrev).blockX < 0
+                        || ((blockList.get(blockPrev).blockX + blockWidth) - blockList.get(blockCurrent).blockX < 0)) 
+                {
                     blockPrev--;
                     detachPosY += 100;
                     blockList.remove(newBlock);
                     falling();
-                } else {
+                    life--;
+                    lifePoint.setText("Life : " + life);
+                } 
+                else 
+                {
                     newBlockList.add(newBlock);
-                    totalBlock += 1;
-                    Showscore.setText(totalBlock + "");
+                    if (mode.equals("story"))
+                        totalBlock--;
+                    else
+                        totalBlock++;
+                    
+                     score.setText("Total : " + totalBlock);
 
-                    if (newBlockList.size() % 3 == 0) {
-
+                    if (newBlockList.size() % 3 == 0) 
+                    {
                         scrolling();
                         detachPosY += 100;
-                        if (countScroll == 0) {
+                        if (countScroll <= 3) 
+                        {
                             countScroll++;
-                            System.out.println("HEHE");
                             background = new TranslateTransition();
                             background.setDuration(Duration.millis(1000));
-                            background.setNode(GameApp.bg);
+                            if (mode.equals("story"))
+                                background.setNode(StoryMode.bg);
+                            else
+                                background.setNode(GameApp.bg);
                             background.setToY(scrollY);
                             background.setCycleCount(1);
                             background.setAutoReverse(true);
                             background.play();
                         }
+                        scrollY += 215;
                     }
-                    
-                    if (newBlockList.size() > 3) {
+
+                    if (newBlockList.size() > 3) 
+                    {
                         Random rand = new Random();
                         int direction;
                         direction = rand.nextInt(2) + 1;
 
-                        if (direction == 1) {
-                            moveTo = new MoveTo(100, 50);
-                            CubicCurveTo cubicCurveTo = new CubicCurveTo(250, 100, 350, 370, 450, 600);
+                        if (direction == 1) 
+                        {
+                            int start = this.blockX - 350;
+                            moveTo = new MoveTo(start, 50);
+                            CubicCurveTo cubicCurveTo = new CubicCurveTo(start + 150, 100, start + 250, 370, newBlock.blockX, newBlock.blockY + 180);
 
                             int character = rand.nextInt(3) + 1;
 
                             if (character == 1) {
 
                                 try {
-                                    human = Files.newInputStream(Paths.get("/Users/namedojimo/NetBeansProjects/Project/src/towerbloxx/oldJetRight.png"));
+                                    human = Files.newInputStream(Paths.get("/Users/PM/Documents/NetBeansProjects/TowerBloxx/src/towerbloxx/oldJetRight.png"));
                                     imgHuman = new ImageView(new Image(human));
                                     imgHuman.setFitWidth(50);
                                     imgHuman.setFitHeight(50);
                                 } catch (IOException e) {
-                                    System.out.println("Cannot load Human.png");
+                                    System.out.println("Cannot load oldJetRight.png");
                                 }
                                 getChildren().add(imgHuman);
                                 path = new Path();
@@ -241,12 +296,12 @@ public class Block extends Pane {
                             }
                             if (character == 2) {
                                 try {
-                                    human = Files.newInputStream(Paths.get("/Users/namedojimo/NetBeansProjects/Project/src/towerbloxx/PenguinFartRight.png"));
+                                    human = Files.newInputStream(Paths.get("/Users/PM/Documents/NetBeansProjects/TowerBloxx/src/towerbloxx/PenguinFartRight.png"));
                                     imgHuman = new ImageView(new Image(human));
                                     imgHuman.setFitWidth(50);
                                     imgHuman.setFitHeight(50);
                                 } catch (IOException e) {
-                                    System.out.println("Cannot load Human.png");
+                                    System.out.println("Cannot load PenguinFartLeft.png");
                                 }
                                 getChildren().add(imgHuman);
                                 path = new Path();
@@ -269,12 +324,12 @@ public class Block extends Pane {
                             }
                             if (character == 3) {
                                 try {
-                                    human = Files.newInputStream(Paths.get("/Users/namedojimo/NetBeansProjects/Project/src/towerbloxx/parachute.png"));
+                                    human = Files.newInputStream(Paths.get("/Users/PM/Documents/NetBeansProjects/TowerBloxx/src/towerbloxx/parachute.png"));
                                     imgHuman = new ImageView(new Image(human));
                                     imgHuman.setFitWidth(100);
                                     imgHuman.setFitHeight(100);
                                 } catch (IOException e) {
-                                    System.out.println("Cannot load Human.png");
+                                    System.out.println("Cannot load parachute.png");
                                 }
                                 getChildren().add(imgHuman);
                                 path = new Path();
@@ -297,20 +352,22 @@ public class Block extends Pane {
                             }
                         }
                         if (direction == 2) {
-                            moveTo = new MoveTo(600, 50);
-                            CubicCurveTo cubicCurveTo = new CubicCurveTo(550, 100, 400, 370, 350, 350);
+                int start = this.blockX + 250;
+                
+                moveTo = new MoveTo(start, 50);
+                CubicCurveTo cubicCurveTo = new CubicCurveTo(start - 50, 100, start - 200, 370, newBlock.blockX , newBlock.blockY + 180);
 
                             int character = rand.nextInt(3) + 1;
 
                             if (character == 1) {
 
                                 try {
-                                    human = Files.newInputStream(Paths.get("/Users/namedojimo/NetBeansProjects/Project/src/towerbloxx/parachute.png"));
+                                    human = Files.newInputStream(Paths.get("/Users/PM/Documents/NetBeansProjects/TowerBloxx/src/towerbloxx/parachute.png"));
                                     imgHuman = new ImageView(new Image(human));
                                     imgHuman.setFitWidth(50);
                                     imgHuman.setFitHeight(50);
                                 } catch (IOException e) {
-                                    System.out.println("Cannot load Human.png");
+                                    System.out.println("Cannot load parachute.png");
                                 }
                                 getChildren().add(imgHuman);
                                 path = new Path();
@@ -335,12 +392,12 @@ public class Block extends Pane {
                             }
                             if (character == 2) {
                                 try {
-                                    human = Files.newInputStream(Paths.get("/Users/namedojimo/NetBeansProjects/Project/src/towerbloxx/PenguinFartLeft.png"));
+                                    human = Files.newInputStream(Paths.get("/Users/PM/Documents/NetBeansProjects/TowerBloxx/src/towerbloxx/PenguinFartLeft.png"));
                                     imgHuman = new ImageView(new Image(human));
                                     imgHuman.setFitWidth(50);
                                     imgHuman.setFitHeight(50);
                                 } catch (IOException e) {
-                                    System.out.println("Cannot load Human.png");
+                                    System.out.println("Cannot load PenguinFartLeft.png");
                                 }
                                 getChildren().add(imgHuman);
                                 path = new Path();
@@ -363,12 +420,12 @@ public class Block extends Pane {
                             }
                             if (character == 3) {
                                 try {
-                                    human = Files.newInputStream(Paths.get("/Users/namedojimo/NetBeansProjects/Project/src/towerbloxx/parachute.png"));
+                                    human = Files.newInputStream(Paths.get("/Users/PM/Documents/NetBeansProjects/TowerBloxx/src/towerbloxx/parachute.png"));
                                     imgHuman = new ImageView(new Image(human));
                                     imgHuman.setFitWidth(100);
                                     imgHuman.setFitHeight(100);
                                 } catch (IOException e) {
-                                    System.out.println("Cannot load Human.png");
+                                    System.out.println("Cannot load parachute.png");
                                 }
                                 getChildren().add(imgHuman);
                                 path = new Path();
@@ -391,20 +448,21 @@ public class Block extends Pane {
                             }
                         }
                         if (direction == 3) {
-                            moveTo = new MoveTo(200, 200);
-                            CubicCurveTo cubicCurveTo = new CubicCurveTo(250, 300, 300, 200, 400, 200);
+                int start = blockX - 400;
+                moveTo = new MoveTo(start, newBlock.blockY);
+                CubicCurveTo cubicCurveTo = new CubicCurveTo(start + 150, 300, start + 300, 200, newBlock.blockX, newBlock.blockY + 180);
 
-                            int character = rand.nextInt(3) + 1;
+                            int character = rand.nextInt(2) + 1;
 
                             if (character == 1) {
 
                                 try {
-                                    human = Files.newInputStream(Paths.get("/Users/namedojimo/NetBeansProjects/Project/src/towerbloxx/oldJetLeft.png"));
+                                    human = Files.newInputStream(Paths.get("/Users/PM/Documents/NetBeansProjects/TowerBloxx/src/towerbloxx/oldJetLeft.png"));
                                     imgHuman = new ImageView(new Image(human));
                                     imgHuman.setFitWidth(50);
                                     imgHuman.setFitHeight(50);
                                 } catch (IOException e) {
-                                    System.out.println("Cannot load Human.png");
+                                    System.out.println("Cannot load oldJetLeft.png");
                                 }
                                 getChildren().add(imgHuman);
                                 path = new Path();
@@ -429,12 +487,12 @@ public class Block extends Pane {
                             }
                             if (character == 2) {
                                 try {
-                                    human = Files.newInputStream(Paths.get("/Users/namedojimo/NetBeansProjects/Project/src/towerbloxx/PenguinFartLeft.png"));
+                                    human = Files.newInputStream(Paths.get("/Users/PM/Documents/NetBeansProjects/TowerBloxx/src/towerbloxx/PenguinFartLeft.png"));
                                     imgHuman = new ImageView(new Image(human));
                                     imgHuman.setFitWidth(50);
                                     imgHuman.setFitHeight(50);
                                 } catch (IOException e) {
-                                    System.out.println("Cannot load Human.png");
+                                    System.out.println("Cannot load PenguinFartLeft.png");
                                 }
                                 getChildren().add(imgHuman);
                                 path = new Path();
@@ -457,12 +515,12 @@ public class Block extends Pane {
                             }
                             if (character == 3) {
                                 try {
-                                    human = Files.newInputStream(Paths.get("/Users/namedojimo/NetBeansProjects/Project/src/towerbloxx/parachute.png"));
+                                    human = Files.newInputStream(Paths.get("/Users/PM/Documents/NetBeansProjects/TowerBloxx/src/towerbloxx/parachute.png"));
                                     imgHuman = new ImageView(new Image(human));
                                     imgHuman.setFitWidth(100);
                                     imgHuman.setFitHeight(100);
                                 } catch (IOException e) {
-                                    System.out.println("Cannot load Human.png");
+                                    System.out.println("Cannot load parachute.png");
                                 }
                                 getChildren().add(imgHuman);
                                 path = new Path();
@@ -488,11 +546,20 @@ public class Block extends Pane {
                 }
             }
         }
+        if (life == 0)
+        {
+            isOver = true;
+            Pane over = new GameOver().runGameOver();
+            Main.gameover = new Scene(over);
+            Main.primaryStage.setScene(Main.gameover);
+            Main.primaryStage.show();
+        }
+        
         swing();
-        //return check;
     }
     
-    public void collapseLeft() {
+    public void collapseLeft() 
+    {
         int xPos = newBlock.blockX;
         int yPos = newBlock.blockY;
 
@@ -529,7 +596,8 @@ public class Block extends Pane {
         ft.play();
     }
 
-    public void collapseRight() {
+    public void collapseRight() 
+    {        
         int xPos = newBlock.blockX;
         int yPos = newBlock.blockY;
 
@@ -566,7 +634,8 @@ public class Block extends Pane {
         ft.play();
     }
 
-    public void falling() {
+    public void falling() 
+    {   
         translateTransition = new TranslateTransition();
         translateTransition.setNode(newBlock);
         translateTransition.setDuration(Duration.millis(1000));
@@ -587,7 +656,8 @@ public class Block extends Pane {
         ft.play();
     }
 
-    public void scrolling() {
+    public void scrolling() 
+    {
         translateTransition = new TranslateTransition();
         translateTransition.setNode(imgBlock);
         translateTransition.setDuration(Duration.millis(1000));
@@ -619,9 +689,5 @@ public class Block extends Pane {
         }
 
         detachPosY += 150;
-
-        check = true;
-
     }
-
 }
