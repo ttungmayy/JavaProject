@@ -184,7 +184,6 @@ public class Block extends Pane {
 
                         scrolling();
                         detachPosY += 100;
-                        //check = true;
                         if (countScroll == 0) {
                             countScroll++;
                             System.out.println("HEHE");
@@ -195,11 +194,9 @@ public class Block extends Pane {
                             background.setCycleCount(1);
                             background.setAutoReverse(true);
                             background.play();
-
-                            //bg.setTranslateY(scrollY);
                         }
                     }
-                    check = false;
+                    
                     if (newBlockList.size() > 3) {
                         Random rand = new Random();
                         int direction;
